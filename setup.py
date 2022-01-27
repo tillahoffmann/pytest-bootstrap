@@ -6,7 +6,6 @@ setup(
     packages=find_packages(),
     version='0.1.0',
     install_requires=[
-        'matplotlib',
         'numpy',
     ],
     extras_require={
@@ -17,6 +16,7 @@ setup(
             'scipy',
         ],
         'docs': [
+            'matplotlib',
             'sphinx',
         ]
     },

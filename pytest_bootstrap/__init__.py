@@ -4,6 +4,9 @@ import warnings
 
 
 class BootstrapTestError(RuntimeError):
+    """
+    Reference value falls outside bootstrapped confidence interval.
+    """
     pass
 
 
