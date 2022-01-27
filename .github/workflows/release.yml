@@ -1,0 +1,17 @@
+name: Release
+on:
+  push:
+    tags:
+    - 'v*'
+jobs:
+  build:
+    name: Relase package.
+    runs-on: "ubuntu-latest"
+    steps:
+    - name: Build the distribution.
+      run: make sdist
+    - name: Publish the package.
+      uses: pypa/gh-action-pypi-publish@master
+      with:
+        user: __token__
+        password: ${{ secrets.pypi_password }}
