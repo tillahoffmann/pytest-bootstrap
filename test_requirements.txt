@@ -44,8 +44,9 @@ matplotlib==3.5.1
     # via pytest-bootstrap
 mccabe==0.6.1
     # via flake8
-numpy==1.22.1
+numpy==1.21.5
     # via
+    #   -r test_requirements.in
     #   matplotlib
     #   pytest-bootstrap
     #   scipy
