@@ -3,5 +3,5 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.autodoc',
 ]
-project = 'TEMPLATE_NAME'
+project = 'pytest_bootstrap'
 napoleon_custom_sections = [('Returns', 'params_style')]

@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 
 setup(
-    name='TEMPLATE_NAME',
+    name='pytest-bootstrap',
     packages=find_packages(),
     version='0.1.0',
     install_requires=[
@@ -14,9 +14,13 @@ setup(
             'flake8',
             'pytest',
             'pytest-cov',
+            'scipy',
         ],
         'docs': [
             'sphinx',
         ]
-    }
+    },
+    classifiers=[
+        'Framework :: Pytest',
+    ],
 )
