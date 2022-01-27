@@ -33,6 +33,7 @@ setup(
             'pytest',
             'pytest-cov',
             'scipy',
+            'twine',
         ],
         'docs': [
             'matplotlib',
