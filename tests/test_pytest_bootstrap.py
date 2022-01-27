@@ -15,12 +15,6 @@ def test_mean_fail():
         pytest_bootstrap.bootstrap_test(x, np.mean, 1)
 
 
-def test_success_due_to_small_sample():
-    x = np.random.normal(0, 1, 10)
-    # This test passes despite the reference value being wrong because the sample is small.
-    pytest_bootstrap.bootstrap_test(x, np.mean, .1)
-
-
 def test_calibration():
     num_runs = 200
     num_failures = 0
