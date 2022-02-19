@@ -8,8 +8,10 @@ with open('README.rst') as fp:
 long_description = long_description \
     .replace('.. doctest::', '.. code-block:: python') \
     .replace(':math:', ':code:')
-long_description = re.sub(r'(\.\. automodule:: .*?$)|(\.\. toctree::)|(\.\. plot::)', r':code:`\1`',
-                          long_description, flags=re.MULTILINE)
+long_description = re.sub(
+    r'(\.\. automodule:: .*?$)|(\.\. toctree::)|(\.\. plot:: .*?$)', r':code:`\1`',
+    long_description, flags=re.MULTILINE
+)
 
 
 # Load the version number
