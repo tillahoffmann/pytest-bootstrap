@@ -1,4 +1,4 @@
-🧪 pytest_bootstrap
+🧪 pytest-bootstrap
 ===================
 
 .. image:: https://github.com/tillahoffmann/pytest-bootstrap/actions/workflows/main.yml/badge.svg
@@ -7,10 +7,16 @@
 .. image:: https://readthedocs.org/projects/pytest-bootstrap/badge/?version=latest
   :target: https://pytest-bootstrap.readthedocs.io/en/latest/?badge=latest
   :alt: Documentation status.
+.. image:: https://img.shields.io/pypi/v/pytest-bootstrap
+  :target: https://pypi.org/project/pytest-bootstrap/
+  :alt: PyPI package version.
 
-Scientific software development often relies on stochasticity, e.g. for `Monte Carlo <https://en.wikipedia.org/wiki/Monte_Carlo_integration>`_ integration or simulating the `Ising model <https://en.wikipedia.org/wiki/Ising_model>`_. Testing non-deterministic code is difficult. This package offers a bootstrap test to validate stochastic algorithms.
+Scientific software development often relies on stochasticity, e.g. for `Monte Carlo <https://en.wikipedia.org/wiki/Monte_Carlo_integration>`_ integration or simulating the `Ising model <https://en.wikipedia.org/wiki/Ising_model>`_. Testing non-deterministic code is difficult. This package offers a bootstrap test to validate stochastic algorithms, including multiple hypothesis correction for vector statistics. It can be installed by running :code:`pip install pytest-bootstrap`.
 
-For example, suppose we want to implement the expected value of `log-normal distribution <https://en.wikipedia.org/wiki/Log-normal_distribution>`_ with location parameter :math:`\mu` and scale parameter :math:`\sigma`.
+Example
+-------
+
+Suppose we want to implement the expected value of `log-normal distribution <https://en.wikipedia.org/wiki/Log-normal_distribution>`_ with location parameter :math:`\mu` and scale parameter :math:`\sigma`.
 
 .. doctest::
 
@@ -39,7 +45,7 @@ This returns a summary of the test, such as the bootstrapped statistics.
 .. doctest::
 
   >>> result.keys()
-  dict_keys(['alpha', 'reference', 'lower', 'upper', 'z_score', 'median', 'iqr', 'statistics'])
+  dict_keys(['alpha', 'alpha_corrected', 'reference', 'lower', 'upper', 'z_score', 'median', 'iqr', 'statistics'])
 
 Comparing with our incorrect implementation reveals the bug.
 
@@ -54,6 +60,9 @@ Comparing with our incorrect implementation reveals the bug.
 Visualising the bootstrapped distribution can help identify discrepancies between the bootstrapped statistics and the theoretical reference value.
 
 .. plot:: examples/lognormal.py
+  :caption: Histogram of bootstrapped means reveals the erroneous implementation of the log-normal mean.
+
+A comprehensive set of examples can be found in `the tests <https://github.com/tillahoffmann/pytest-bootstrap/blob/main/tests/test_pytest_bootstrap.py>`_.
 
 Interface
 ---------

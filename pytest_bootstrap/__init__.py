@@ -12,8 +12,8 @@ class BootstrapTestError(RuntimeError):
 
 def bootstrap_test(samples: np.ndarray, statistic: typing.Callable, reference: float,
                    statistic_args: typing.Iterable = None, statistic_kwargs: typing.Mapping = None,
-                   num_bootstrap_samples: int = 1000,
-                   alpha: float = 1e-2) -> dict:
+                   num_bootstrap_samples: int = 1000, alpha: float = 1e-2,
+                   multiple_hypothesis_correction: str = 'bonferroni') -> dict:
     """
     Compare a bootstrap sample of a :attr:`statistic` evaluated on i.i.d :attr:`samples` from a
     stochastic process with a :attr:`reference` value.
@@ -34,11 +34,16 @@ def bootstrap_test(samples: np.ndarray, statistic: typing.Callable, reference: f
             of the :attr:`statistic` and the :attr:`reference` value. :attr:`alpha` roughly
             corresponds to the probability that the test will fail even if the :attr:`reference`
             value is correct. This value should be small for the test to pass with high probability.
-        ax: Axes for plotting the bootstrap distribution if desired.
+        multiple_hypothesis_correction: Method used to correct for multiple hypotheses being tested
+            if the statistic is vector-valued. :code:`False` disables multiple hypothesis
+            correction.
 
     Returns:
         result: Dictionary of test information, comprising
 
+            - :attr:`alpha_corrected` -- Significance level after multiple hypothesis correction.
+              Equal to :attr:`alpha` if the statistic is a scalar or no multiple hypothesis
+              correction is applied.
             - :attr:`lower` -- Lower limit of the :code:`1 - alpha` bootstrapped interval, i.e. the
               :code:`alpha / 2` quantile.
             - :attr:`upper` -- Upper limit of the :code:`1 - alpha` bootstrapped interval, i.e. the
@@ -50,10 +55,6 @@ def bootstrap_test(samples: np.ndarray, statistic: typing.Callable, reference: f
               vector of bootstrapped :attr:`statistic`.
 
     """
-    if alpha < 1 / num_bootstrap_samples:
-        warnings.warn('cannot estimate tail probabilities smaller than `1 / (num_bootstrap_samples '
-                      f'= {num_bootstrap_samples})', UserWarning)
-
     statistic_args = statistic_args or ()
     statistic_kwargs = statistic_kwargs or {}
 
@@ -66,12 +67,30 @@ def bootstrap_test(samples: np.ndarray, statistic: typing.Callable, reference: f
         statistics.append(statistic(bootstrap_sample, *statistic_args, **statistic_kwargs))
     statistics = np.asarray(statistics)
 
+    # Sanity check for the dimensionality of the statistic and apply multiple hypothesis correction.
+    alpha_corrected = alpha
+    if statistics.ndim > 2:
+        raise ValueError('only scalar and vector statistics are supported, not statistics with '
+                         f'{statistics.ndim - 1} dimensions')
+    elif statistics.ndim == 2:
+        if multiple_hypothesis_correction == 'bonferroni':
+            alpha_corrected = alpha / statistics.shape[1]
+        elif multiple_hypothesis_correction:
+            raise NotImplementedError('multiple hypothesis correction '
+                                      f'`{multiple_hypothesis_correction} is not supported')
+
+    if alpha_corrected < 1 / num_bootstrap_samples:
+        warnings.warn('cannot estimate tail probabilities smaller than `1 / (num_bootstrap_samples '
+                      f'= {num_bootstrap_samples})', UserWarning)
+
     # Evaluate the interval.
-    lower, upper = np.percentile(statistics, [100 * alpha / 2, 100 * (1 - alpha / 2)])
+    quantiles = [100 * alpha_corrected / 2, 100 * (1 - alpha_corrected / 2)]
+    lower, upper = np.percentile(statistics, quantiles, axis=0)
 
     # Collect summary information.
     result = {
         'alpha': alpha,
+        'alpha_corrected': alpha,
         'reference': reference,
         'lower': lower,
         'upper': upper,
@@ -81,7 +100,7 @@ def bootstrap_test(samples: np.ndarray, statistic: typing.Callable, reference: f
     }
 
     # Fail the test if the p-value is smaller than the desired significance level.
-    if reference < lower or reference > upper:
+    if np.any(reference < lower) or np.any(reference > upper):
         raise BootstrapTestError(result)
     result['statistics'] = statistics
     return result
