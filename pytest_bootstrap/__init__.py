@@ -13,14 +13,17 @@ class BootstrapTestError(RuntimeError):
 def bootstrap_test(samples: np.ndarray, statistic: typing.Callable, reference: float,
                    statistic_args: typing.Iterable = None, statistic_kwargs: typing.Mapping = None,
                    num_bootstrap_samples: int = 1000, alpha: float = 1e-2,
-                   multiple_hypothesis_correction: str = 'bonferroni') -> dict:
+                   multiple_hypothesis_correction: str = 'bonferroni', rtol: float = 1e-7,
+                   atol: float = 0) -> dict:
     """
     Compare a bootstrap sample of a :attr:`statistic` evaluated on i.i.d :attr:`samples` from a
     stochastic process with a :attr:`reference` value.
 
     The test will fail if the :attr:`reference` lies outside the :code:`1 - alpha` posterior
     interval, i.e. is smaller than the empirical :code:`alpha / 2` quantile or larger than the
-    :code:`1 - alpha / 2` quantile.
+    :code:`1 - alpha / 2` quantile. The relative :attr:`rtol` and absolute tolerance :attr:`atol`
+    are added together to obtain an overall tolerance :code:`atol + rtol * abs(reference)` for the
+    interval test (see :func:`numpy.isclose` for further details).
 
     Args:
         samples: I.i.d. samples from a stochastic process on which to evaluate the
@@ -37,6 +40,8 @@ def bootstrap_test(samples: np.ndarray, statistic: typing.Callable, reference: f
         multiple_hypothesis_correction: Method used to correct for multiple hypotheses being tested
             if the statistic is vector-valued. :code:`False` disables multiple hypothesis
             correction.
+        rtol: Relative tolerance.
+        atol: Absolute tolerance.
 
     Returns:
         result: Dictionary of test information, comprising
@@ -88,6 +93,7 @@ def bootstrap_test(samples: np.ndarray, statistic: typing.Callable, reference: f
     lower, upper = np.percentile(statistics, quantiles, axis=0)
 
     # Collect summary information.
+    tol = atol + rtol * np.abs(reference)
     result = {
         'alpha': alpha,
         'alpha_corrected': alpha,
@@ -97,10 +103,11 @@ def bootstrap_test(samples: np.ndarray, statistic: typing.Callable, reference: f
         'z_score': (reference - np.mean(statistics)) / np.std(statistics),
         'median': np.median(statistics),
         'iqr': np.diff(np.percentile(statistics, [25, 75])).squeeze(),
+        'tol': tol,
     }
 
-    # Fail the test if the p-value is smaller than the desired significance level.
-    if np.any(reference < lower) or np.any(reference > upper):
+    # Fail the test if the reference value lies outside the interval.
+    if np.any(reference < lower - tol) or np.any(reference > upper + tol):
         raise BootstrapTestError(result)
     result['statistics'] = statistics
     return result
