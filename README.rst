@@ -45,7 +45,8 @@ This returns a summary of the test, such as the bootstrapped statistics.
 .. doctest::
 
   >>> result.keys()
-  dict_keys(['alpha', 'alpha_corrected', 'reference', 'lower', 'upper', 'z_score', 'median', 'iqr', 'statistics'])
+  dict_keys(['alpha', 'alpha_corrected', 'reference', 'lower', 'upper',
+             'z_score', 'median', 'iqr', 'tol', 'statistics'])
 
 Comparing with our incorrect implementation reveals the bug.
 

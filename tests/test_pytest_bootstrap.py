@@ -79,3 +79,19 @@ def test_unsupported_multiple_hypothesis_correction():
         x = np.random.normal(0, 1, (100, 3))
         pytest_bootstrap.bootstrap_test(x, lambda x: np.mean(x, axis=0), 0,
                                         multiple_hypothesis_correction='some-method')
+
+
+def test_tolerance():
+    x = 2.9 * np.ones(10)
+    with pytest.raises(pytest_bootstrap.BootstrapTestError):
+        pytest_bootstrap.bootstrap_test(x, np.mean, 3)
+
+    # Absolute tolerance.
+    with pytest.raises(pytest_bootstrap.BootstrapTestError):
+        pytest_bootstrap.bootstrap_test(x, np.mean, 2, atol=0.099)
+    pytest_bootstrap.bootstrap_test(x, np.mean, 3, atol=0.11)
+
+    # Relative tolerance.
+    with pytest.raises(pytest_bootstrap.BootstrapTestError):
+        pytest_bootstrap.bootstrap_test(x, np.mean, 3, rtol=0.033)
+    pytest_bootstrap.bootstrap_test(x, np.mean, 3, rtol=0.034)
