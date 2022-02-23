@@ -9,7 +9,7 @@ long_description = long_description \
     .replace('.. doctest::', '.. code-block:: python') \
     .replace(':math:', ':code:')
 long_description = re.sub(
-    r'(\.\. automodule:: .*?$)|(\.\. toctree::)|(\.\. plot:: .*?$)', r':code:`\1`',
+    r'((\.\. automodule:: .*?$)|(\.\. toctree::)|(\.\. plot:: .*?$))', r'.. code-block::\n\n  \1',
     long_description, flags=re.MULTILINE
 )
 
@@ -24,6 +24,9 @@ except FileNotFoundError:
 
 setup(
     name='pytest-bootstrap',
+    url='https://github.com/tillahoffmann/pytest-bootstrap',
+    author='Till Hoffmann',
+    author_email='lozenge.houses.0n@icloud.com',
     packages=find_packages(),
     version=version,
     install_requires=[

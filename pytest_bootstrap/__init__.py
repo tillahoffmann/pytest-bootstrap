@@ -7,7 +7,11 @@ class BootstrapTestError(RuntimeError):
     """
     Reference value falls outside bootstrapped confidence interval.
     """
-    pass
+    def __init__(self, result: dict):
+        self.result = result
+        message = f'the reference value {result["reference"]} lies outside the 1 - (alpha = ' \
+            f'{result["alpha"]}) interval [{result["lower"]}, {result["upper"]}]'
+        super().__init__(message)
 
 
 def bootstrap_test(samples: np.ndarray, statistic: typing.Callable, reference: float,
