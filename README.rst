@@ -56,7 +56,8 @@ Comparing with our incorrect implementation reveals the bug.
   >>> result = bootstrap_test(x, np.mean, reference_wrong)
   Traceback (most recent call last):
     ...
-  pytest_bootstrap.BootstrapTestError: {'alpha': 0.01, reference: 1.0, ...
+  pytest_bootstrap.BootstrapTestError: the reference value 1.0 lies outside
+    the 1 - (alpha = 0.01) interval ...
 
 Visualising the bootstrapped distribution can help identify discrepancies between the bootstrapped statistics and the theoretical reference value.
 
