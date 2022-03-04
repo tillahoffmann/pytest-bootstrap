@@ -7,7 +7,8 @@ with open('README.rst') as fp:
     long_description = fp.read()
 long_description = long_description \
     .replace('.. doctest::', '.. code-block:: python') \
-    .replace(':math:', ':code:')
+    .replace(':math:', ':code:') \
+    .replace(':func:', ':code:')
 long_description = re.sub(
     r'((\.\. automodule:: .*?$)|(\.\. toctree::)|(\.\. plot:: .*?$))', r'.. code-block::\n\n  \1',
     long_description, flags=re.MULTILINE
@@ -39,6 +40,9 @@ setup(
             'pytest-cov',
             'scipy',
             'twine',
+        ],
+        'plot': [
+            'matplotlib',
         ],
         'docs': [
             'matplotlib',
