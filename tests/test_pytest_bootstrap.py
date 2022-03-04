@@ -95,3 +95,16 @@ def test_tolerance():
     with pytest.raises(pytest_bootstrap.BootstrapTestError):
         pytest_bootstrap.bootstrap_test(x, np.mean, 3, rtol=0.033)
     pytest_bootstrap.bootstrap_test(x, np.mean, 3, rtol=0.034)
+
+
+def test_on_fail_warn():
+    x = 2.9 * np.ones(10)
+    with pytest.warns(UserWarning, match='the reference value'):
+        result = pytest_bootstrap.bootstrap_test(x, np.mean, 3, on_fail='warn')
+    assert result['upper'] < 3
+
+
+def test_on_fail_invalid():
+    x = 2.9 * np.ones(10)
+    with pytest.raises(ValueError):
+        pytest_bootstrap.bootstrap_test(x, np.mean, 3, on_fail='invalid')

@@ -18,7 +18,7 @@ def bootstrap_test(samples: np.ndarray, statistic: typing.Callable, reference: f
                    statistic_args: typing.Iterable = None, statistic_kwargs: typing.Mapping = None,
                    num_bootstrap_samples: int = 1000, alpha: float = 1e-2,
                    multiple_hypothesis_correction: str = 'bonferroni', rtol: float = 1e-7,
-                   atol: float = 0) -> dict:
+                   atol: float = 0, on_fail: str = 'raise') -> dict:
     """
     Compare a bootstrap sample of a :attr:`statistic` evaluated on i.i.d :attr:`samples` from a
     stochastic process with a :attr:`reference` value.
@@ -46,6 +46,7 @@ def bootstrap_test(samples: np.ndarray, statistic: typing.Callable, reference: f
             correction.
         rtol: Relative tolerance.
         atol: Absolute tolerance.
+        on_fail: Raise a :class:`BootstrapTestError` if :code:`raise` or warn if :code:`warn`.
 
     Returns:
         result: Dictionary of test information, comprising
@@ -62,7 +63,6 @@ def bootstrap_test(samples: np.ndarray, statistic: typing.Callable, reference: f
             - :attr:`z_score` -- Z-score of the :attr:`reference` value under the bootstrapped
               distribution, i.e. :code:`(reference - mean(s)) / std(s)`, where :attr:`s` is the
               vector of bootstrapped :attr:`statistic`.
-
     """
     statistic_args = statistic_args or ()
     statistic_kwargs = statistic_kwargs or {}
@@ -112,6 +112,12 @@ def bootstrap_test(samples: np.ndarray, statistic: typing.Callable, reference: f
 
     # Fail the test if the reference value lies outside the interval.
     if np.any(reference < lower - tol) or np.any(reference > upper + tol):
-        raise BootstrapTestError(result)
+        error = BootstrapTestError(result)
+        if on_fail == 'raise':
+            raise error
+        elif on_fail == 'warn':
+            warnings.warn(error)
+        else:
+            raise ValueError(on_fail)
     result['statistics'] = statistics
     return result
