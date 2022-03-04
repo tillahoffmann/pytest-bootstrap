@@ -59,7 +59,7 @@ Comparing with our incorrect implementation reveals the bug.
   pytest_bootstrap.BootstrapTestError: the reference value 1.0 lies outside
     the 1 - (alpha = 0.01) interval ...
 
-Visualising the bootstrapped distribution can help identify discrepancies between the bootstrapped statistics and the theoretical reference value.
+Visualising the bootstrapped distribution using :func:`pytest_bootstrap.result_hist` can help identify discrepancies between the bootstrapped statistics and the theoretical reference value. Note that you need to install matplotlib separately or install pytest-bootstrap using :code:`pip install pytest-bootstrap[plot]`.
 
 .. plot:: examples/lognormal.py
   :caption: Histogram of bootstrapped means reveals the erroneous implementation of the log-normal mean.

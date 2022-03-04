@@ -108,3 +108,9 @@ def test_on_fail_invalid():
     x = 2.9 * np.ones(10)
     with pytest.raises(ValueError):
         pytest_bootstrap.bootstrap_test(x, np.mean, 3, on_fail='invalid')
+
+
+def test_result_hist():
+    x = np.random.normal(0, 1, 100)
+    result = pytest_bootstrap.bootstrap_test(x, np.mean, 0)
+    pytest_bootstrap.result_hist(result)
